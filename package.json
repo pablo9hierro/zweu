@@ -1,0 +1,26 @@
+{
+  "name": "zweu-magazord-proxy",
+  "version": "1.0.0",
+  "description": "Servidor proxy para API do Magazord - Integração com Stevo IA",
+  "main": "api/magazord.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "proxy",
+    "magazord",
+    "vercel",
+    "serverless",
+    "api"
+  ],
+  "author": "Pablo",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  }
+}
