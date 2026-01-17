@@ -1,27 +1,35 @@
 ﻿/**
  * Proxy HTTP para API do Magazord
  * Endpoint: POST /api/magazord
+ * CORS ULTRA ROBUSTO
  */
 
 export default async function handler(req, res) {
-  // Configurar CORS COMPLETO
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', '*');
-  res.setHeader('Access-Control-Max-Age', '86400');
-  
-  // Responder preflight OPTIONS
+  // FUNÇÃO AUXILIAR: Adicionar headers CORS em TODAS as respostas
+  const setCorsHeaders = (response) => {
+    response.setHeader('Access-Control-Allow-Credentials', 'true');
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    response.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+    response.setHeader('Access-Control-Expose-Headers', '*');
+    response.setHeader('Access-Control-Max-Age', '86400');
+    return response;
+  };
+
+  // Aplicar CORS em TODAS as respostas
+  setCorsHeaders(res);
+
+  // Responder imediatamente ao preflight OPTIONS
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
-  // Permitir apenas POST
+  // Permitir apenas POST (além de OPTIONS)
   if (req.method !== 'POST') {
     return res.status(405).json({ 
       error: 'Método não permitido',
-      allowedMethods: ['POST'] 
+      allowedMethods: ['POST', 'OPTIONS'] 
     });
   }
 
@@ -99,6 +107,9 @@ export default async function handler(req, res) {
       responseData = { response: text };
     }
 
+    // Garantir CORS novamente antes de retornar
+    setCorsHeaders(res);
+
     // Retornar resposta com mesmo status da API
     return res.status(apiResponse.status).json({
       success: apiResponse.ok,
@@ -108,6 +119,9 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Erro no proxy:', error);
+    
+    // Garantir CORS mesmo em erro
+    setCorsHeaders(res);
     
     return res.status(500).json({
       error: 'Erro ao processar requisição',
