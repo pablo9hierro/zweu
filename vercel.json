@@ -1,23 +1,5 @@
 ﻿{
   "version": 2,
-  "name": "zweu-magazord-proxy",
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Authorization"
-      }
-    }
-  ],
   "headers": [
     {
       "source": "/api/(.*)",
@@ -32,13 +14,9 @@
         },
         {
           "key": "Access-Control-Allow-Headers",
-          "value": "X-Requested-With, Content-Type, Authorization"
+          "value": "Content-Type, Authorization"
         }
       ]
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "regions": ["gru1"]
+  ]
 }
