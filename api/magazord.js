@@ -1,9 +1,19 @@
-/**
+﻿/**
  * Proxy HTTP para API do Magazord
  * Endpoint: POST /api/magazord
  */
 
 export default async function handler(req, res) {
+  // Configurar CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  // Responder preflight OPTIONS
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   // Permitir apenas POST
   if (req.method !== 'POST') {
     return res.status(405).json({ 
@@ -47,16 +57,16 @@ export default async function handler(req, res) {
     }
 
     // Montar URL com query params
-    let fullUrl = `${BASE_URL}${endpoint}`;
+    let fullUrl = ${BASE_URL};
     if (query && Object.keys(query).length > 0) {
       const params = new URLSearchParams(query);
-      fullUrl += `?${params.toString()}`;
+      fullUrl += ?;
     }
 
     // Preparar headers
-    const authToken = Buffer.from(`${USER}:${PASS}`).toString('base64');
+    const authToken = Buffer.from(${USER}:).toString('base64');
     const headers = {
-      'Authorization': `Basic ${authToken}`,
+      'Authorization': Basic ,
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     };
