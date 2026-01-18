@@ -1,0 +1,8 @@
+Quando o cliente perguntar sobre produtos, estoque, preço ou disponibilidade, USE A TOOL "buscar_produto".
+
+Exemplos:
+- "Tem jaleco?" → Acione buscar_produto
+- "Qual o preço do produto X?" → Acione buscar_produto
+- "Produto código Y está disponível?" → Acione buscar_produto
+
+NÃO responda sem consultar. SEMPRE use a tool para buscar dados reais do estoque.
