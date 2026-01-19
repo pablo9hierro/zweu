@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     // Se AINDA está vazio, pega QUALQUER string que vier
     if (!termoBusca) {
       const valores = Object.values(params).filter(v => 
-        v && typeof v === 'string' && v.trim().length > 0
+        v && typeof v === 'string' && v.trim().length > 0 && v !== 'undefined'
       );
       termoBusca = valores[0] || '';
     }
