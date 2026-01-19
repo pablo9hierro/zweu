@@ -14,17 +14,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Recebe mensagem do cliente (texto livre)
+    // Recebe QUALQUER parâmetro possível
     const params = { ...req.query, ...req.body };
-    const mensagem = params.mensagem || params.query || params.q || params.texto || '';
+    console.log('📥 Todos os parâmetros:', params);
     
-    console.log('💬 Mensagem do cliente:', mensagem);
+    // Tenta extrair mensagem de QUALQUER campo
+    let mensagem = params.mensagem || params.query || params.q || params.texto || 
+                   params.nome || params.busca || params.search || params.produto || '';
+    
+    // Se AINDA não tem mensagem, pega QUALQUER valor de string dos params
+    if (!mensagem && Object.keys(params).length > 0) {
+      const valores = Object.values(params);
+      mensagem = valores.find(v => typeof v === 'string' && v.length > 0) || '';
+    }
+    
+    console.log('💬 Mensagem interpretada:', mensagem);
 
     if (!mensagem) {
-      return res.status(400).json({
-        error: 'Mensagem não informada',
-        hint: 'Envie: {mensagem: "jaleco azul tamanho M"}'
-      });
+      console.log('⚠️ Nenhuma mensagem detectada. Retornando produtos padrão.');
+      mensagem = 'jaleco'; // Default para teste
     }
 
     // INTERPRETA a mensagem e monta query
