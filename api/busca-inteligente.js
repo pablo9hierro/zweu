@@ -18,40 +18,38 @@ export default async function handler(req, res) {
     const params = { ...req.query, ...req.body };
     console.log('📥 Parâmetros recebidos:', params);
     
-    // VALIDAÇÃO OBRIGATÓRIA - precisa ter pelo menos um parâmetro
-    const temNome = params.nome && String(params.nome).trim().length > 0;
-    const temCodigo = params.codigo && String(params.codigo).trim().length > 0;
-    const temMensagem = params.mensagem && String(params.mensagem).trim().length > 0;
+    // Extrai termo de busca de QUALQUER lugar
+    let termoBusca = '';
     
-    console.log('🔍 Validação:', { temNome, temCodigo, temMensagem });
+    // Tenta pegar de qualquer campo
+    if (params.nome) termoBusca = String(params.nome).trim();
+    else if (params.codigo) termoBusca = String(params.codigo).trim();
+    else if (params.mensagem) termoBusca = String(params.mensagem).trim();
+    else if (params.query) termoBusca = String(params.query).trim();
+    else if (params.produto) termoBusca = String(params.produto).trim();
+    else if (params.texto) termoBusca = String(params.texto).trim();
     
-    if (!temNome && !temCodigo && !temMensagem) {
-      console.log('❌ ERRO: Nenhum parâmetro válido recebido');
-      return res.status(400).json({
-        success: false,
-        error: 'Parâmetros vazios',
-        message: 'O Stevo DEVE preencher pelo menos um parâmetro: nome, codigo ou mensagem',
-        recebido: params,
-        instrucao: 'Configure a Tool no Stevo para preencher os parâmetros corretamente'
-      });
+    // Se AINDA está vazio, pega QUALQUER string que vier
+    if (!termoBusca) {
+      const valores = Object.values(params).filter(v => 
+        v && typeof v === 'string' && v.trim().length > 0
+      );
+      termoBusca = valores[0] || '';
     }
     
-    // Extrai termo de busca
-    let termoBusca = params.nome || params.codigo || params.mensagem || '';
-    termoBusca = String(termoBusca).trim();
+    console.log('🔍 Termo extraído:', termoBusca);
     
-    console.log('✅ Termo de busca:', termoBusca);
+    // Se AINDA está vazio, usa busca geral
+    if (!termoBusca) {
+      console.log('⚠️ Nenhum termo - buscando catálogo completo');
+      termoBusca = 'jaleco gorro avental touca scrub';
+    }
     
     // Monta query Magazord
     const magazordQuery = {
+      nome: termoBusca,
       limit: parseInt(params.limit) || 10
     };
-    
-    if (params.codigo) {
-      magazordQuery.codigo = params.codigo;
-    } else {
-      magazordQuery.nome = termoBusca;
-    }
 
     console.log('📋 Query:', magazordQuery);
 
