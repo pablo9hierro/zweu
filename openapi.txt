@@ -1,0 +1,264 @@
+═══════════════════════════════════════════════════════════════
+  ESPECIFICAÇÃO DA API - BUSCAR PRODUTOS
+═══════════════════════════════════════════════════════════════
+
+VERSÃO: 2.0.0
+URL BASE: https://zweu.vercel.app
+ENDPOINT: /api/buscar-produto
+MÉTODO: POST
+FORMATO: JSON
+
+═══════════════════════════════════════════════════════════════
+  📝 DESCRIÇÃO
+═══════════════════════════════════════════════════════════════
+
+🔍 BUSCA PRODUTOS NO CATÁLOGO
+
+⚠️ REGRA OBRIGATÓRIA: SEMPRE envie pelo menos um parâmetro!
+
+COMO USAR:
+1. Cliente pergunta: "tem jaleco?"
+2. Você EXTRAI a palavra: "jaleco"
+3. Você ENVIA: { "nome": "jaleco" }
+
+❌ NUNCA FAÇA: Enviar {} vazio
+✅ SEMPRE FAÇA: Extrair termo e enviar no parâmetro "nome"
+
+═══════════════════════════════════════════════════════════════
+  📤 PARÂMETROS DE ENTRADA (REQUEST)
+═══════════════════════════════════════════════════════════════
+
+URL: https://zweu.vercel.app/api/buscar-produto
+Método: POST
+Content-Type: application/json
+
+PARÂMETROS:
+
+1. nome (string) - OBRIGATÓRIO
+   Descrição: Palavra-chave do produto que o cliente mencionou
+   Exemplos:
+   - "tem jaleco?" → nome: "jaleco"
+   - "mostra gorro" → nome: "gorro"
+   - "preciso avental" → nome: "avental"
+
+2. codigo (string) - OPCIONAL
+   Descrição: Código exato quando o cliente mencionar
+   Exemplo:
+   - "código 300-MC-049" → codigo: "300-MC-049"
+
+3. limit (integer) - OPCIONAL
+   Descrição: Quantidade de resultados
+   Padrão: 10
+   Mínimo: 1
+   Máximo: 50
+
+═══════════════════════════════════════════════════════════════
+  📚 EXEMPLOS DE REQUISIÇÕES
+═══════════════════════════════════════════════════════════════
+
+EXEMPLO 1: Busca básica
+Cliente: "tem jaleco?"
+Você envia:
+{
+  "nome": "jaleco"
+}
+
+EXEMPLO 2: Busca com cor
+Cliente: "mostra gorro azul"
+Você envia:
+{
+  "nome": "gorro azul"
+}
+
+EXEMPLO 3: Busca com quantidade
+Cliente: "quero 5 aventais"
+Você envia:
+{
+  "nome": "avental",
+  "limit": 5
+}
+
+EXEMPLO 4: Busca por código
+Cliente: "código 300-MC-049"
+Você envia:
+{
+  "codigo": "300-MC-049"
+}
+
+═══════════════════════════════════════════════════════════════
+  📥 RESPOSTA (RESPONSE)
+═══════════════════════════════════════════════════════════════
+
+STATUS 200 - SUCESSO
+
+A API retorna um JSON com esta estrutura:
+
+{
+  "sucesso": true,
+  "total_produtos": 279,
+  "produtos_retornados": 10,
+  "mensagem_para_cliente": "Encontrei 279 produto(s). Aqui estão os primeiros 10:",
+  "produtos": [
+    {
+      "id": 12345,
+      "codigo": "300-MC-049",
+      "nome": "Jaleco Branco Manga Longa",
+      "ativo": true,
+      "preco": 89.90,
+      "preco_promocional": 69.90,
+      "estoque_disponivel": 50,
+      "imagens": [
+        {
+          "url": "https://example.com/imagem.jpg",
+          "principal": true
+        }
+      ],
+      "derivacoes": [
+        {
+          "codigo": "300-MC-049-P",
+          "nome": "Tamanho P",
+          "estoque": 10,
+          "preco": 89.90
+        }
+      ]
+    }
+  ],
+  "busca_realizada": {
+    "termo": "jaleco",
+    "limit": 10
+  }
+}
+
+CAMPOS DA RESPOSTA:
+
+- sucesso (boolean): true se deu certo
+- total_produtos (integer): Total de produtos encontrados no catálogo
+- produtos_retornados (integer): Quantidade nesta resposta (máximo 10)
+- mensagem_para_cliente (string): 🎯 USE ESTA MENSAGEM como base para responder!
+- produtos (array): Lista dos produtos
+  - id (integer): ID do produto
+  - codigo (string): Código do produto
+  - nome (string): Nome do produto
+  - ativo (boolean): Se está ativo
+  - preco (number): Preço de venda
+  - preco_promocional (number): Preço promocional (pode ser null)
+  - estoque_disponivel (integer): Quantidade em estoque
+  - imagens (array): Fotos do produto
+  - derivacoes (array): Variações (tamanhos, cores, etc)
+- busca_realizada (object): O que foi buscado
+
+═══════════════════════════════════════════════════════════════
+  ❌ ERROS
+═══════════════════════════════════════════════════════════════
+
+STATUS 400 - PARÂMETROS INVÁLIDOS
+
+Quando você não envia parâmetros ou envia vazio:
+
+{
+  "error": "Parâmetro obrigatório não fornecido",
+  "mensagem": "Você deve fornecer pelo menos um dos parâmetros: nome, codigo, produto ou mensagem",
+  "parametros_recebidos": {},
+  "exemplo": {
+    "nome": "jaleco",
+    "limit": 10
+  }
+}
+
+STATUS 500 - ERRO DO SERVIDOR
+
+Quando há um erro interno:
+
+{
+  "error": "Erro interno do servidor",
+  "mensagem": "Detalhes do erro"
+}
+
+═══════════════════════════════════════════════════════════════
+  🤖 INSTRUÇÕES PARA O STEVO IA
+═══════════════════════════════════════════════════════════════
+
+QUANDO USAR:
+Cliente pergunta sobre produtos, estoque, preço ou disponibilidade
+
+COMO ENVIAR:
+1. Extraia a palavra-chave da mensagem
+2. Envie: { "nome": "palavra_extraida" }
+
+COMO INTERPRETAR A RESPOSTA:
+1. Use o campo "mensagem_para_cliente" como base
+2. Mostre os produtos do array "produtos"
+3. Para cada produto, mostre:
+   - nome
+   - preco (ou preco_promocional se disponível)
+   - estoque_disponivel
+
+═══════════════════════════════════════════════════════════════
+  📚 EXEMPLO COMPLETO DE USO
+═══════════════════════════════════════════════════════════════
+
+PASSO 1 - Cliente pergunta:
+"tem jaleco?"
+
+PASSO 2 - Você extrai:
+Palavra-chave: "jaleco"
+
+PASSO 3 - Você envia para API:
+POST https://zweu.vercel.app/api/buscar-produto
+{
+  "nome": "jaleco"
+}
+
+PASSO 4 - API retorna:
+{
+  "total_produtos": 279,
+  "mensagem_para_cliente": "Encontrei 279 produto(s)...",
+  "produtos": [
+    {
+      "nome": "Jaleco Branco Manga Longa",
+      "preco": 89.90,
+      "estoque_disponivel": 50
+    }
+  ]
+}
+
+PASSO 5 - Você responde ao cliente:
+"Sim! Encontrei 279 jalecos disponíveis. Aqui estão alguns:
+
+1. Jaleco Branco Manga Longa - R$ 89,90 (50 em estoque)
+2. [próximo produto]
+...
+
+Qual modelo você tem interesse?"
+
+═══════════════════════════════════════════════════════════════
+  ⚠️ REGRAS CRÍTICAS
+═══════════════════════════════════════════════════════════════
+
+❌ NUNCA envie: {}
+❌ NUNCA envie: { "nome": "" }
+❌ NUNCA invente dados
+
+✅ SEMPRE extraia a palavra da mensagem
+✅ SEMPRE envie o parâmetro "nome"
+✅ SEMPRE use os dados REAIS da resposta
+✅ SEMPRE mostre preços e estoque
+
+═══════════════════════════════════════════════════════════════
+  ✅ SE NÃO ENCONTRAR PRODUTOS
+═══════════════════════════════════════════════════════════════
+
+Se total_produtos = 0:
+
+Você responde: "Não encontrei esse produto no momento. 
+Posso ajudar com algum outro produto?"
+
+═══════════════════════════════════════════════════════════════
+  📞 SUPORTE
+═══════════════════════════════════════════════════════════════
+
+URL da API: https://zweu.vercel.app/api/buscar-produto
+Logs: https://vercel.com/pablo-s-projects-4d0aab9d/zweu/logs
+Documentação: Ver arquivos no repositório
+
+═══════════════════════════════════════════════════════════════

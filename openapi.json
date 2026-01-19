@@ -1,0 +1,270 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Buscar Produtos",
+    "description": "🔍 **BUSCA PRODUTOS NO CATÁLOGO**\n\n⚠️ **REGRA OBRIGATÓRIA**: SEMPRE envie pelo menos um parâmetro!\n\n📝 **COMO USAR**:\n1. Cliente pergunta: \"tem jaleco?\"\n2. Você EXTRAI a palavra: \"jaleco\"\n3. Você ENVIA: { \"nome\": \"jaleco\" }\n\n❌ **NUNCA FAÇA**: Enviar {} vazio\n✅ **SEMPRE FAÇA**: Extrair termo e enviar no parâmetro \"nome\"",
+    "version": "2.0.0",
+    "contact": {
+      "name": "Suporte MVP"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://zweu.vercel.app",
+      "description": "Servidor de Produção"
+    }
+  ],
+  "paths": {
+    "/api/buscar-produto": {
+      "post": {
+        "operationId": "buscarProduto",
+        "summary": "Buscar produtos",
+        "description": "🎯 **FUNÇÃO**: Buscar produtos no catálogo\n\n📋 **INSTRUÇÕES OBRIGATÓRIAS**:\n\nPASSO 1: Leia a mensagem do cliente\nPASSO 2: Identifique o PRODUTO mencionado\nPASSO 3: Extraia a PALAVRA-CHAVE\nPASSO 4: Coloque no parâmetro \"nome\"\nPASSO 5: Envie a requisição\n\n📚 **EXEMPLOS DIRETOS**:\n\nCliente fala: \"tem jaleco?\"\nVocê EXTRAI: \"jaleco\"\nVocê ENVIA: { \"nome\": \"jaleco\" }\n\nCliente fala: \"mostra gorro azul\"\nVocê EXTRAI: \"gorro azul\"\nVocê ENVIA: { \"nome\": \"gorro azul\" }\n\nCliente fala: \"código 300-MC-049\"\nVocê EXTRAI: \"300-MC-049\"\nVocê ENVIA: { \"codigo\": \"300-MC-049\" }\n\nCliente fala: \"quero 5 aventais\"\nVocê EXTRAI: \"avental\"\nVocê ENVIA: { \"nome\": \"avental\", \"limit\": 5 }\n\n⚠️ **CRÍTICO**: NUNCA envie {} vazio!",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "description": "📝 PALAVRA-CHAVE do produto que o cliente mencionou\n\nExemplos:\n- Cliente: \"tem jaleco?\" → nome: \"jaleco\"\n- Cliente: \"mostra gorro\" → nome: \"gorro\"\n- Cliente: \"preciso avental\" → nome: \"avental\"",
+                    "example": "jaleco"
+                  },
+                  "codigo": {
+                    "type": "string",
+                    "description": "🔢 CÓDIGO EXATO quando o cliente mencionar código\n\nExemplo:\n- Cliente: \"código 300-MC-049\" → codigo: \"300-MC-049\"",
+                    "example": "300-MC-049"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "Quantidade de resultados (padrão 10)",
+                    "default": 10,
+                    "minimum": 1,
+                    "maximum": 50,
+                    "example": 10
+                  }
+                },
+                "required": ["nome"]
+              },
+              "examples": {
+                "exemplo_basico": {
+                  "summary": "Cliente pergunta 'tem jaleco?'",
+                  "description": "Você extrai 'jaleco' e envia",
+                  "value": {
+                    "nome": "jaleco"
+                  }
+                },
+                "exemplo_com_cor": {
+                  "summary": "Cliente pergunta 'mostra gorro azul'",
+                  "description": "Você extrai 'gorro azul' e envia",
+                  "value": {
+                    "nome": "gorro azul"
+                  }
+                },
+                "exemplo_com_quantidade": {
+                  "summary": "Cliente pede 'quero 5 aventais'",
+                  "description": "Você extrai 'avental' e limit 5",
+                  "value": {
+                    "nome": "avental",
+                    "limit": 5
+                  }
+                },
+                "exemplo_codigo": {
+                  "summary": "Cliente fala 'código 300-MC-049'",
+                  "description": "Você usa o parâmetro codigo",
+                  "value": {
+                    "codigo": "300-MC-049"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Produtos encontrados com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sucesso": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "total_produtos": {
+                      "type": "integer",
+                      "description": "Total de produtos encontrados no catálogo",
+                      "example": 279
+                    },
+                    "produtos_retornados": {
+                      "type": "integer",
+                      "description": "Quantidade de produtos nesta resposta (máx 10)",
+                      "example": 10
+                    },
+                    "mensagem_para_cliente": {
+                      "type": "string",
+                      "description": "🎯 USE ESTA MENSAGEM COMO BASE para responder o cliente! Ela já vem formatada e pronta para usar.",
+                      "example": "Encontrei 279 produto(s). Aqui estão os primeiros 10:"
+                    },
+                    "produtos": {
+                      "type": "array",
+                      "description": "Lista dos produtos encontrados",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 12345
+                          },
+                          "codigo": {
+                            "type": "string",
+                            "example": "300-MC-049"
+                          },
+                          "nome": {
+                            "type": "string",
+                            "example": "Jaleco Branco Manga Longa"
+                          },
+                          "ativo": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "preco": {
+                            "type": "number",
+                            "format": "float",
+                            "example": 89.90
+                          },
+                          "preco_promocional": {
+                            "type": "number",
+                            "format": "float",
+                            "nullable": true,
+                            "example": 69.90
+                          },
+                          "estoque_disponivel": {
+                            "type": "integer",
+                            "example": 50
+                          },
+                          "imagens": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "url": {
+                                  "type": "string",
+                                  "format": "uri",
+                                  "example": "https://example.com/imagem.jpg"
+                                },
+                                "principal": {
+                                  "type": "boolean",
+                                  "example": true
+                                }
+                              }
+                            }
+                          },
+                          "derivacoes": {
+                            "type": "array",
+                            "description": "Variações do produto (tamanhos, cores, etc)",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "codigo": {
+                                  "type": "string",
+                                  "example": "300-MC-049-P"
+                                },
+                                "nome": {
+                                  "type": "string",
+                                  "example": "Tamanho P"
+                                },
+                                "estoque": {
+                                  "type": "integer",
+                                  "example": 10
+                                },
+                                "preco": {
+                                  "type": "number",
+                                  "example": 89.90
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "busca_realizada": {
+                      "type": "object",
+                      "properties": {
+                        "termo": {
+                          "type": "string",
+                          "example": "jaleco"
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros inválidos ou ausentes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Parâmetro obrigatório não fornecido"
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "Você deve fornecer pelo menos um dos parâmetros: nome, codigo, produto ou mensagem"
+                    },
+                    "parametros_recebidos": {
+                      "type": "object"
+                    },
+                    "exemplo": {
+                      "type": "object",
+                      "example": {
+                        "nome": "jaleco",
+                        "limit": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Erro interno do servidor"
+                    },
+                    "mensagem": {
+                      "type": "string",
+                      "example": "Detalhes do erro"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {}
+  },
+  "x-stevo-instructions": "═══════════════════════════════════════════════════════════════\n🤖 STEVO - INSTRUÇÕES COMPLETAS\n═══════════════════════════════════════════════════════════════\n\n📋 QUANDO USAR:\nCliente pergunta sobre produtos, estoque, preço ou disponibilidade\n\n📤 COMO ENVIAR:\n1. Extraia a palavra-chave da mensagem\n2. Envie: { \"nome\": \"palavra_extraida\" }\n\n📥 COMO INTERPRETAR A RESPOSTA:\n\nA API retorna um JSON assim:\n{\n  \"sucesso\": true,\n  \"total_produtos\": 279,\n  \"produtos_retornados\": 10,\n  \"mensagem_para_cliente\": \"Encontrei 279 produto(s)...\",\n  \"produtos\": [ array de produtos ]\n}\n\n⚠️ INSTRUÇÕES CRÍTICAS PARA RESPONDER O CLIENTE:\n\n1️⃣ Use o campo \"mensagem_para_cliente\" como base\n2️⃣ Mostre os produtos do array \"produtos\"\n3️⃣ Para cada produto, mostre:\n   - nome\n   - preco (ou preco_promocional se disponível)\n   - estoque_disponivel\n\n═══════════════════════════════════════════════════════════════\n📚 EXEMPLO DE RESPOSTA AO CLIENTE:\n═══════════════════════════════════════════════════════════════\n\nCliente: \"tem jaleco?\"\nVocê ENVIA: { \"nome\": \"jaleco\" }\n\nAPI RETORNA:\n{\n  \"total_produtos\": 279,\n  \"mensagem_para_cliente\": \"Encontrei 279 produto(s)...\",\n  \"produtos\": [\n    {\n      \"nome\": \"Jaleco Branco Manga Longa\",\n      \"preco\": 89.90,\n      \"estoque_disponivel\": 50\n    }\n  ]\n}\n\nVOCÊ RESPONDE AO CLIENTE:\n\"Sim! Encontrei 279 jalecos disponíveis. Aqui estão alguns:\n\n1. Jaleco Branco Manga Longa - R$ 89,90 (50 em estoque)\n2. [próximo produto]\n...\"\n\n═══════════════════════════════════════════════════════════════\n❌ SE total_produtos = 0:\n═══════════════════════════════════════════════════════════════\n\nVOCÊ RESPONDE: \"Não encontrei esse produto no momento.\"\n\n═══════════════════════════════════════════════════════════════\n✅ SEMPRE:\n═══════════════════════════════════════════════════════════════\n\n- Use os dados REAIS da resposta\n- Mostre preços e estoque\n- Seja claro e objetivo\n- Ofereça ajuda adicional\n\n═══════════════════════════════════════════════════════════════"
+}
