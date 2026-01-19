@@ -1,37 +1,153 @@
-IMPORTANTE: Você DEVE preencher os parâmetros abaixo quando usar esta ferramenta.
+═══════════════════════════════════════════════════════════════
+  FERRAMENTA: buscar_produto
+  ENDPOINT: /api/buscar-produto
+  MÉTODO: POST
+═══════════════════════════════════════════════════════════════
 
-PARÂMETROS OBRIGATÓRIOS (preencha pelo menos UM):
-• nome (string) - palavra-chave do produto
-• codigo (string) - código do produto
-• limit (number) - quantidade (padrão: 10)
+⚠️ REGRA CRÍTICA: VOCÊ DEVE SEMPRE ENVIAR PARÂMETROS
+❌ SEM PARÂMETROS = ERRO 400
 
-INSTRUÇÕES CRÍTICAS:
-1. NUNCA deixe os parâmetros vazios
-2. SEMPRE extraia informações da mensagem do cliente
-3. SEMPRE preencha "nome" quando cliente mencionar produto
-4. SEMPRE adicione "limit" com valor numérico
+═══════════════════════════════════════════════════════════════
+  PARÂMETROS ACEITOS
+═══════════════════════════════════════════════════════════════
 
-EXEMPLOS OBRIGATÓRIOS:
+Você DEVE preencher pelo menos UM destes:
+
+• nome (string)     → palavra-chave do produto
+• codigo (string)   → código exato do produto  
+• produto (string)  → termo alternativo
+• mensagem (string) → mensagem completa do usuário
+
+Opcional:
+• limit (number)    → quantidade de resultados (padrão: 10)
+
+═══════════════════════════════════════════════════════════════
+  COMO USAR - PASSO A PASSO
+═══════════════════════════════════════════════════════════════
+
+1. Leia a mensagem do cliente
+2. Identifique o produto mencionado
+3. Extraia o termo de busca
+4. Preencha o parâmetro correspondente
+5. Envie a requisição
+
+═══════════════════════════════════════════════════════════════
+  EXEMPLOS PRÁTICOS
+═══════════════════════════════════════════════════════════════
 
 Cliente: "tem jaleco?"
-VOCÊ PREENCHE:
-nome = "jaleco"
-limit = 10
+VOCÊ ENVIA:
+{
+  "nome": "jaleco",
+  "limit": 10
+}
 
 Cliente: "mostra gorro azul"
-VOCÊ PREENCHE:
-nome = "gorro azul"
-limit = 10
+VOCÊ ENVIA:
+{
+  "nome": "gorro azul",
+  "limit": 10
+}
 
 Cliente: "código 300-MC-049"
-VOCÊ PREENCHE:
-codigo = "300-MC-049"
-limit = 1
+VOCÊ ENVIA:
+{
+  "codigo": "300-MC-049",
+  "limit": 1
+}
 
 Cliente: "quero 5 aventais"
-VOCÊ PREENCHE:
-nome = "avental"
-limit = 5
+VOCÊ ENVIA:
+{
+  "nome": "avental",
+  "limit": 5
+}
 
-Se você enviar parâmetros VAZIOS, a requisição vai FALHAR.
-SEMPRE preencha pelo menos "nome" com o produto que o cliente mencionou.
+Cliente: "tem jaleco, gorro e avental?"
+VOCÊ ENVIA (uma busca de cada vez):
+{
+  "nome": "jaleco gorro avental",
+  "limit": 15
+}
+
+═══════════════════════════════════════════════════════════════
+  RESPOSTA QUE VOCÊ VAI RECEBER
+═══════════════════════════════════════════════════════════════
+
+{
+  "sucesso": true,
+  "total_produtos": 15,
+  "produtos": [
+    {
+      "id": 12345,
+      "codigo": "300-MC-049",
+      "nome": "Jaleco Branco Manga Longa",
+      "ativo": true,
+      "preco": 89.90,
+      "preco_promocional": 69.90,
+      "estoque_disponivel": 50,
+      "imagens": [
+        {
+          "url": "https://...",
+          "principal": true
+        }
+      ],
+      "derivacoes": [
+        {
+          "codigo": "300-MC-049-P",
+          "nome": "Tamanho P",
+          "estoque": 10,
+          "preco": 89.90
+        }
+      ]
+    }
+  ],
+  "busca_realizada": {
+    "termo": "jaleco",
+    "limit": 10
+  }
+}
+
+═══════════════════════════════════════════════════════════════
+  O QUE FAZER COM A RESPOSTA
+═══════════════════════════════════════════════════════════════
+
+1. Verifique "total_produtos" → se 0, produto não encontrado
+2. Mostre os produtos encontrados ao cliente
+3. Informe: nome, preço, estoque disponível
+4. Se houver derivações, informe tamanhos/cores disponíveis
+5. Mostre as imagens se disponíveis
+
+═══════════════════════════════════════════════════════════════
+  ERROS COMUNS - NÃO FAÇA ISSO
+═══════════════════════════════════════════════════════════════
+
+❌ ERRADO: Enviar sem parâmetros
+{}
+
+❌ ERRADO: Enviar parâmetro vazio
+{
+  "nome": "",
+  "limit": 10
+}
+
+❌ ERRADO: Não extrair o termo da mensagem
+Cliente: "tem jaleco?"
+Você: {} ← ERRO!
+
+✅ CORRETO:
+{
+  "nome": "jaleco",
+  "limit": 10
+}
+
+═══════════════════════════════════════════════════════════════
+  IMPORTANTE
+═══════════════════════════════════════════════════════════════
+
+⚠️ SEMPRE extraia o termo da mensagem do cliente
+⚠️ NUNCA envie requisição vazia
+⚠️ SEMPRE preencha pelo menos um parâmetro
+⚠️ Se não conseguir identificar o produto, peça ao cliente para especificar
+
+═══════════════════════════════════════════════════════════════
