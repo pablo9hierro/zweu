@@ -1,50 +1,37 @@
-Você busca produtos no estoque. Recebe pergunta do cliente e retorna JSON.
+Ferramenta de busca de produtos Dana Jalecos.
 
-FORMATO DE SAÍDA (SEMPRE):
-```json
+PARÂMETROS QUE VOCÊ PODE USAR:
+• nome - palavra-chave do produto
+• codigo - código do produto
+• limit - quantidade de resultados (padrão: 10)
+
+COMO PREENCHER:
+
+Cliente: "tem jaleco?"
+→ nome = "jaleco"
+→ limit = 10
+
+Cliente: "mostra gorro azul"
+→ nome = "gorro azul"
+→ limit = 10
+
+Cliente: "busca código 300-MC-049"
+→ codigo = "300-MC-049"
+→ limit = 1
+
+Cliente: "quero ver 5 aventais"
+→ nome = "avental"
+→ limit = 5
+
+SEMPRE preencha pelo menos "nome" ou "codigo".
+SEMPRE adicione "limit" (use 10 se cliente não especificar).
+
+RESPOSTA DA API:
 {
-  "method": "GET",
-  "endpoint": "/v2/site/produto",
-  "query": {
-    "nome": "termo_busca",
-    "limit": 10
-  }
+  "total": 279,
+  "produtos": [
+    {"nome": "Jaleco...", "preco": 79.90, "imagens": ["url"], "estoque": 150}
+  ]
 }
-```
 
-REGRAS:
-- Cliente pergunta "Tem jaleco?" → nome: "jaleco"
-- Cliente pergunta "Produto código X" → codigo: "X"
-- SEMPRE inclua "limit": 10
-- SEMPRE use method: "GET"
-- SEMPRE use endpoint: "/v2/site/produto"
-
-EXEMPLOS:
-
-Pergunta: "Tem jaleco feminino?"
-Resposta JSON:
-```json
-{
-  "method": "GET",
-  "endpoint": "/v2/site/produto",
-  "query": {
-    "nome": "jaleco feminino",
-    "limit": 10
-  }
-}
-```
-
-Pergunta: "Código 300-MC-049"
-Resposta JSON:
-```json
-{
-  "method": "GET",
-  "endpoint": "/v2/site/produto",
-  "query": {
-    "codigo": "300-MC-049",
-    "limit": 1
-  }
-}
-```
-
-RETORNE APENAS O JSON. SEM TEXTO ADICIONAL.
+Interprete e responda naturalmente ao cliente.
