@@ -20,15 +20,34 @@ export default async function handler(req, res) {
     const params = { ...req.query, ...req.body };
     console.log('📝 Parâmetros unificados:', JSON.stringify(params, null, 2));
 
-    // Monta query para Magazord
-    const magazordQuery = {};
+    // Extrai termo de busca de QUALQUER lugar
+    let termoBusca = '';
+    if (params.nome) termoBusca = String(params.nome).trim();
+    else if (params.codigo) termoBusca = String(params.codigo).trim();
+    else if (params.mensagem) termoBusca = String(params.mensagem).trim();
+    else if (params.produto) termoBusca = String(params.produto).trim();
     
-    if (params.nome) magazordQuery.nome = params.nome;
-    if (params.codigo) magazordQuery.codigo = params.codigo;
-    if (params.ean) magazordQuery.ean = parseInt(params.ean);
-    if (params.categoria) magazordQuery.categoria = parseInt(params.categoria);
-    if (params.limit) magazordQuery.limit = parseInt(params.limit) || 10;
-    else magazordQuery.limit = 10; // Default
+    // Se AINDA vazio, pega QUALQUER string
+    if (!termoBusca) {
+      const valores = Object.values(params).filter(v => 
+        v && typeof v === 'string' && v.trim().length > 0 && v !== 'undefined'
+      );
+      termoBusca = valores[0] || '';
+    }
+    
+    console.log('🔍 Termo extraído:', termoBusca);
+    
+    // Se AINDA vazio, busca catálogo geral
+    if (!termoBusca) {
+      console.log('⚠️ Sem termo - buscando catálogo');
+      termoBusca = 'jaleco gorro avental touca scrub';
+    }
+
+    // Monta query para Magazord
+    const magazordQuery = {
+      nome: termoBusca,
+      limit: parseInt(params.limit) || 10
+    };
 
     console.log('🔍 Query montada para Magazord:', JSON.stringify(magazordQuery, null, 2));
 
