@@ -80,7 +80,20 @@ export default async function handler(req, res) {
         id: p.id,
         nome: p.nome,
         codigo: p.codigo,
-        ativo: p.ativo
+        ativo: p.ativo,
+        preco_venda: p.preco_venda,
+        preco_venda_por: p.preco_venda_por,
+        estoque_disponivel: p.estoque_disponivel,
+        imagens: p.midias?.map(m => ({
+          url: m.url_original || m.url,
+          principal: m.principal || false
+        })) || [],
+        derivacoes: p.derivacoes?.map(d => ({
+          codigo: d.codigo,
+          nome: d.nome,
+          estoque: d.estoque,
+          preco: d.preco
+        })) || []
       })) || [],
       busca_realizada: magazordQuery
     };
