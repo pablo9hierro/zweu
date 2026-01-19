@@ -1,176 +1,196 @@
-# 🚀 ZWEU - Proxy Magazord para Stevo IA
+# 🏥 ZWEU - API de Busca de Produtos Magazord
 
-Servidor proxy serverless na Vercel para integração entre Stevo IA e API do Magazord.
+MVP simples para integração Stevo IA + Magazord via Vercel
 
-## 📋 Arquitetura
+## 🎯 O que faz?
 
-```
-Cliente (Stevo IA)
-    ↓ POST /api/magazord
-Servidor Vercel (proxy)
-    ↓ HTTP autenticado
-API Magazord
-    ↓ JSON response
-Servidor Vercel
-    ↓ JSON response
-Cliente
-```
+1. Cliente pergunta no WhatsApp: "tem jaleco?"
+2. Stevo IA entende e extrai: `nome="jaleco"`
+3. Envia para Vercel: `POST /api/buscar-produto`
+4. Vercel consulta Magazord (autenticado)
+5. Retorna produtos com preço, estoque, imagens
+6. Stevo responde o cliente com dados reais
 
-## 🔧 Tecnologias
+## 🚀 Deploy
 
-- **Runtime**: Node.js 18+
-- **Deploy**: Vercel Serverless Functions
-- **Autenticação**: HTTP Basic Auth
-- **Formato**: JSON
-
-## 📁 Estrutura
-
-```
-/
-├── api/
-│   └── magazord.js     # Endpoint principal
-├── .gitignore
-├── package.json
-├── vercel.json         # Configuração Vercel
-└── README.md
-```
-
-## 🚀 Deploy na Vercel
-
-### 1. Instalar Vercel CLI (opcional)
 ```bash
-npm install -g vercel
-```
+# Clone o repositório
+git clone https://github.com/pablo9hierro/zweu.git
+cd zweu
 
-### 2. Fazer Deploy
-```bash
-# Login na Vercel
-vercel login
+# Configure as variáveis de ambiente no Vercel:
+# MAGAZORD_BASE_URL=https://urlmagazord.com.br/api
+# MAGAZORD_USER=seu_usuario
+# MAGAZORD_PASS=sua_senha
 
 # Deploy
 vercel --prod
 ```
 
-### 3. Configurar Variáveis de Ambiente na Vercel
+## 📡 Endpoint
 
-No painel da Vercel (https://vercel.com), vá em:
-**Settings → Environment Variables**
+**URL:** `https://zweu.vercel.app/api/buscar-produto`  
+**Método:** `POST`  
+**Content-Type:** `application/json`
 
-Adicione:
-
-| Nome | Valor |
-|------|-------|
-| `MAGAZORD_BASE_URL` | `https://danajalecos.painel.magazord.com.br/api` |
-| `MAGAZORD_USER` | `MZDKe610ed8d77404c8ebe37b79a35b579a5e4e85682c15d6bd89f30d5852757` |
-| `MAGAZORD_PASS` | `o#W51myRIS@j` |
-
-## 📡 Uso da API
-
-### Endpoint
-```
-POST https://seu-projeto.vercel.app/api/magazord
-```
-
-### Formato da Requisição
+### Request
 
 ```json
 {
-  "method": "GET",
-  "endpoint": "/v2/site/produto",
-  "query": {
-    "search": "jaleco",
+  "nome": "jaleco",
+  "limit": 10
+}
+```
+
+**Parâmetros aceitos:**
+- `nome` (string) - palavra-chave do produto
+- `codigo` (string) - código exato do produto
+- `produto` (string) - termo alternativo
+- `mensagem` (string) - mensagem completa do usuário
+- `limit` (integer) - quantidade de resultados (padrão: 10)
+
+⚠️ **Pelo menos um parâmetro é obrigatório**
+
+### Response (200 OK)
+
+```json
+{
+  "sucesso": true,
+  "total_produtos": 15,
+  "produtos": [
+    {
+      "id": 12345,
+      "codigo": "300-MC-049",
+      "nome": "Jaleco Branco Manga Longa",
+      "ativo": true,
+      "preco": 89.90,
+      "preco_promocional": 69.90,
+      "estoque_disponivel": 50,
+      "imagens": [
+        {
+          "url": "https://...",
+          "principal": true
+        }
+      ],
+      "derivacoes": [
+        {
+          "codigo": "300-MC-049-P",
+          "nome": "Tamanho P",
+          "estoque": 10,
+          "preco": 89.90
+        }
+      ]
+    }
+  ],
+  "busca_realizada": {
+    "termo": "jaleco",
     "limit": 10
   }
 }
 ```
 
-### Exemplo com Body (POST/PUT)
+### Response (400 Bad Request)
 
 ```json
 {
-  "method": "POST",
-  "endpoint": "/v2/site/produto",
-  "body": {
-    "nome": "Produto Novo",
-    "preco": 99.90
+  "error": "Parâmetro obrigatório não fornecido",
+  "mensagem": "Você deve fornecer pelo menos um dos parâmetros: nome, codigo, produto ou mensagem",
+  "exemplo": {
+    "nome": "jaleco",
+    "limit": 10
   }
 }
 ```
 
-### Resposta de Sucesso
+## 🔧 Configuração no Stevo
 
-```json
-{
-  "success": true,
-  "status": 200,
-  "data": {
-    // Resposta da API Magazord
-  }
-}
+### 1. Criar Ferramenta
+
+- **Nome:** `buscar_produto`
+- **Tipo:** API/HTTP Request
+- **URL Base:** `https://zweu.vercel.app`
+- **Endpoint:** `/api/buscar-produto`
+- **Método:** `POST`
+
+### 2. OpenAPI Spec
+
+Use o arquivo [openapi.yaml](./openapi.yaml) ou a URL:
+```
+https://zweu.vercel.app/openapi.yaml
 ```
 
-### Resposta de Erro
+### 3. Instruções para IA
 
-```json
-{
-  "error": "Descrição do erro",
-  "message": "Detalhes"
-}
+```
+QUANDO USAR: Cliente pergunta sobre produtos, preço ou estoque
+
+COMO USAR:
+1. Extraia o termo de busca da mensagem
+2. Preencha o parâmetro "nome" 
+3. Execute a ferramenta
+
+EXEMPLOS:
+- "tem jaleco?" → nome="jaleco", limit=10
+- "código X123" → codigo="X123", limit=1
+
+IMPORTANTE: NUNCA envie sem parâmetros
 ```
 
-## 🤖 Configuração no Stevo (Custom Tool)
+## 📁 Estrutura
 
-### Nome da Tool
-`buscar_produto`
-
-### Descrição
 ```
-Busca informações de um produto no estoque pelo código. 
-Usa quando cliente perguntar sobre disponibilidade ou preço.
-```
-
-### Método
-`GET`
-
-### URL do Endpoint
-```
-https://seu-projeto.vercel.app/api/magazord
+zweu/
+├── api/
+│   └── buscar-produto.js       # Único endpoint
+├── openapi.yaml                # Especificação OpenAPI
+├── PROMPT_IA_PRINCIPAL.txt     # Instruções gerais
+├── PROMPT_TOOL.txt             # Instruções da ferramenta
+├── GUIA_CONFIGURACAO.md        # Guia completo de setup
+└── README.md                   # Este arquivo
 ```
 
-### Headers
-```
-Authorization: Bearer {{token}}
-```
+## ✅ Validações
 
-### Query Params
-```
-search: {{termo}}
-limit: {{qtermo}} (padrão: 10)
-```
+- ✅ SEM dados mockados
+- ✅ ERRO 400 se não receber parâmetros
+- ✅ Autenticação Basic Auth com Magazord
+- ✅ Logs detalhados no console
+- ✅ CORS habilitado
+- ✅ Resposta formatada e limpa
 
-### Parâmetros que a IA pode passar
-- `codigo` (string) - Código do produto
+## 🐛 Troubleshooting
 
-### Exemplo de Payload no Stevo
-```json
-{
-  "method": "GET",
-  "endpoint": "/v2/site/produto",
-  "query": {
-    "search": "{{codigo}}",
-    "limit": 1
-  }
-}
-```
+### Erro 400: "Parâmetro obrigatório não fornecido"
+❌ Stevo não está enviando parâmetros  
+✅ Verifique as instruções da ferramenta no Stevo
+
+### Erro 500: "Variáveis de ambiente ausentes"
+❌ Credenciais não configuradas  
+✅ Configure as env vars no Vercel
+
+### IA não chama a ferramenta
+❌ Ferramenta não está ativa ou instruções unclear  
+✅ Ative a ferramenta e atualize as instruções
+
+## 📚 Documentação
+
+- [GUIA_CONFIGURACAO.md](./GUIA_CONFIGURACAO.md) - Passo a passo completo
+- [PROMPT_TOOL.txt](./PROMPT_TOOL.txt) - Instruções da ferramenta
+- [PROMPT_IA_PRINCIPAL.txt](./PROMPT_IA_PRINCIPAL.txt) - Instruções gerais da IA
 
 ## 🔐 Segurança
 
-- ✅ Todas as credenciais em variáveis de ambiente
-- ✅ Zero exposição de credenciais no código
-- ✅ HTTPS obrigatório
-- ✅ Validação de métodos HTTP
-- ✅ Tratamento de erros
+- Credenciais Magazord armazenadas como variáveis de ambiente
+- Sem exposição de senhas no código
+- CORS configurado
+- Validação de parâmetros
 
 ## 📝 Licença
 
 MIT
+
+---
+
+**Desenvolvido por:** Pablo  
+**Versão:** 1.0.0  
+**Status:** ✅ MVP Funcional

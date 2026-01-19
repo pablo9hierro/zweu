@@ -1,70 +1,111 @@
 ═══════════════════════════════════════════════════════════════
-  FERRAMENTA: buscar_produto
-  ENDPOINT: /api/buscar-produto
-  MÉTODO: POST
+  🔧 FERRAMENTA: buscar_produto
+  📍 ENDPOINT: /api/buscar-produto
+  📤 MÉTODO: POST
 ═══════════════════════════════════════════════════════════════
 
-⚠️ REGRA CRÍTICA: VOCÊ DEVE SEMPRE ENVIAR PARÂMETROS
-❌ SEM PARÂMETROS = ERRO 400
+⚠️ REGRA CRÍTICA ABSOLUTA ⚠️
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VOCÊ DEVE **SEMPRE** ENVIAR O PARÂMETRO "nome"
+SE NÃO ENVIAR = ERRO 400 = FALHA TOTAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ═══════════════════════════════════════════════════════════════
-  PARÂMETROS ACEITOS
+  📝 PARÂMETROS QUE VOCÊ ENVIA
 ═══════════════════════════════════════════════════════════════
 
-Você DEVE preencher pelo menos UM destes:
+✅ OBRIGATÓRIO:
+• nome (string) → A PALAVRA que o cliente mencionou
 
-• nome (string)     → palavra-chave do produto
-• codigo (string)   → código exato do produto  
-• produto (string)  → termo alternativo
-• mensagem (string) → mensagem completa do usuário
-
-Opcional:
-• limit (number)    → quantidade de resultados (padrão: 10)
+✅ OPCIONAL:
+• codigo (string) → Se cliente mencionar código específico
+• limit (number)  → Quantidade de resultados (padrão: 10)
 
 ═══════════════════════════════════════════════════════════════
-  COMO USAR - PASSO A PASSO
+  🎯 COMO USAR - PASSO A PASSO DETALHADO
 ═══════════════════════════════════════════════════════════════
 
-1. Leia a mensagem do cliente
-2. Identifique o produto mencionado
-3. Extraia o termo de busca
-4. Preencha o parâmetro correspondente
-5. Envie a requisição
+PASSO 1: Cliente envia mensagem no WhatsApp
+         Exemplo: "tem jaleco?"
+
+PASSO 2: Você IDENTIFICA o produto mencionado
+         Produto identificado: "jaleco"
+
+PASSO 3: Você EXTRAI a palavra-chave
+         Palavra extraída: "jaleco"
+
+PASSO 4: Você PREENCHE o parâmetro "nome"
+         Parâmetro: nome = "jaleco"
+
+PASSO 5: Você ENVIA o JSON
+         JSON: { "nome": "jaleco" }
 
 ═══════════════════════════════════════════════════════════════
-  EXEMPLOS PRÁTICOS
+  📚 EXEMPLOS PRÁTICOS - COPIE ESTE COMPORTAMENTO
 ═══════════════════════════════════════════════════════════════
 
-Cliente: "tem jaleco?"
-VOCÊ ENVIA:
+┌─────────────────────────────────────────────────────────────┐
+│ EXEMPLO 1: Pergunta simples                                │
+└─────────────────────────────────────────────────────────────┘
+
+Cliente digitou: "tem jaleco?"
+
+Você IDENTIFICA: "jaleco"
+Você EXTRAI: "jaleco"
+Você ENVIA:
 {
-  "nome": "jaleco",
-  "limit": 10
+  "nome": "jaleco"
 }
 
-Cliente: "mostra gorro azul"
-VOCÊ ENVIA:
+┌─────────────────────────────────────────────────────────────┐
+│ EXEMPLO 2: Com cor/característica                          │
+└─────────────────────────────────────────────────────────────┘
+
+Cliente digitou: "mostra gorro azul"
+
+Você IDENTIFICA: "gorro azul"
+Você EXTRAI: "gorro azul"
+Você ENVIA:
 {
-  "nome": "gorro azul",
-  "limit": 10
+  "nome": "gorro azul"
 }
 
-Cliente: "código 300-MC-049"
-VOCÊ ENVIA:
+┌─────────────────────────────────────────────────────────────┐
+│ EXEMPLO 3: Pergunta sobre código                           │
+└─────────────────────────────────────────────────────────────┘
+
+Cliente digitou: "código 300-MC-049"
+
+Você IDENTIFICA: "300-MC-049"
+Você EXTRAI: "300-MC-049"
+Você ENVIA:
 {
-  "codigo": "300-MC-049",
-  "limit": 1
+  "codigo": "300-MC-049"
 }
 
-Cliente: "quero 5 aventais"
-VOCÊ ENVIA:
+┌─────────────────────────────────────────────────────────────┐
+│ EXEMPLO 4: Com quantidade                                  │
+└─────────────────────────────────────────────────────────────┘
+
+Cliente digitou: "quero 5 aventais"
+
+Você IDENTIFICA: "avental" e quantidade "5"
+Você EXTRAI: "avental" e 5
+Você ENVIA:
 {
   "nome": "avental",
   "limit": 5
 }
 
-Cliente: "tem jaleco, gorro e avental?"
-VOCÊ ENVIA (uma busca de cada vez):
+┌─────────────────────────────────────────────────────────────┐
+│ EXEMPLO 5: Múltiplos produtos                              │
+└─────────────────────────────────────────────────────────────┘
+
+Cliente digitou: "tem jaleco, gorro e avental?"
+
+Você IDENTIFICA: múltiplos produtos
+Você EXTRAI: "jaleco gorro avental"
+Você ENVIA:
 {
   "nome": "jaleco gorro avental",
   "limit": 15
@@ -119,35 +160,65 @@ VOCÊ ENVIA (uma busca de cada vez):
 5. Mostre as imagens se disponíveis
 
 ═══════════════════════════════════════════════════════════════
-  ERROS COMUNS - NÃO FAÇA ISSO
+  ❌ ERROS FATAIS - NUNCA FAÇA ISSO
 ═══════════════════════════════════════════════════════════════
 
-❌ ERRADO: Enviar sem parâmetros
-{}
+┌─────────────────────────────────────────────────────────────┐
+│ ❌ ERRO 1: Enviar JSON vazio                               │
+└─────────────────────────────────────────────────────────────┘
 
-❌ ERRADO: Enviar parâmetro vazio
-{
-  "nome": "",
-  "limit": 10
-}
-
-❌ ERRADO: Não extrair o termo da mensagem
 Cliente: "tem jaleco?"
-Você: {} ← ERRO!
+Você ENVIA (ERRADO):
+{}
+❌ RESULTADO: ERRO 400 - FALHA TOTAL
 
-✅ CORRETO:
+┌─────────────────────────────────────────────────────────────┐
+│ ❌ ERRO 2: Enviar parâmetro vazio                          │
+└─────────────────────────────────────────────────────────────┘
+
+Cliente: "tem jaleco?"
+Você ENVIA (ERRADO):
 {
-  "nome": "jaleco",
+  "nome": ""
+}
+❌ RESULTADO: ERRO 400 - FALHA TOTAL
+
+┌─────────────────────────────────────────────────────────────┐
+│ ❌ ERRO 3: Não extrair o termo                             │
+└─────────────────────────────────────────────────────────────┘
+
+Cliente: "tem jaleco?"
+Você NÃO EXTRAI e envia (ERRADO):
+{
   "limit": 10
 }
+❌ RESULTADO: ERRO 400 - FALHA TOTAL
+
+┌─────────────────────────────────────────────────────────────┐
+│ ✅ CORRETO: SEMPRE extrair e enviar                        │
+└─────────────────────────────────────────────────────────────┘
+
+Cliente: "tem jaleco?"
+Você EXTRAI "jaleco" e envia (CORRETO):
+{
+  "nome": "jaleco"
+}
+✅ RESULTADO: SUCESSO - PRODUTOS RETORNADOS
 
 ═══════════════════════════════════════════════════════════════
-  IMPORTANTE
+  ⚠️ LEMBRE-SE SEMPRE
 ═══════════════════════════════════════════════════════════════
 
-⚠️ SEMPRE extraia o termo da mensagem do cliente
-⚠️ NUNCA envie requisição vazia
-⚠️ SEMPRE preencha pelo menos um parâmetro
-⚠️ Se não conseguir identificar o produto, peça ao cliente para especificar
+1️⃣ EXTRAIA a palavra-chave da mensagem do cliente
+2️⃣ PREENCHA o parâmetro "nome" com essa palavra
+3️⃣ ENVIE o JSON com o parâmetro preenchido
+4️⃣ NUNCA envie {} vazio
+5️⃣ NUNCA envie "nome": ""
+6️⃣ SEMPRE extraia primeiro, depois envie
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 DICA: Se não conseguir identificar o produto, PERGUNTE ao 
+cliente "Qual produto você procura?" ao invés de enviar vazio!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ═══════════════════════════════════════════════════════════════

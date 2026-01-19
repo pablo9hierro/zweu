@@ -98,11 +98,19 @@ export default async function handler(req, res) {
 
     console.log('✅ Produtos encontrados:', total);
 
-    // Formata resposta
+    // Limita produtos retornados (máximo 10 para não sobrecarregar)
+    const produtosLimitados = produtos.slice(0, Math.min(limit, 10));
+    console.log('📤 Retornando:', produtosLimitados.length, 'produtos');
+
+    // Formata resposta com mensagem de texto clara
     const resultado = {
       sucesso: true,
       total_produtos: total,
-      produtos: produtos.map(p => ({
+      produtos_retornados: produtosLimitados.length,
+      mensagem_para_cliente: total > 0 
+        ? `Encontrei ${total} produto(s). Aqui estão os primeiros ${produtosLimitados.length}:`
+        : `Não encontrei produtos com o termo "${termoBusca}".`,
+      produtos: produtosLimitados.map(p => ({
         id: p.id,
         codigo: p.codigo,
         nome: p.nome,

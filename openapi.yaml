@@ -1,14 +1,22 @@
 openapi: 3.1.0
 info:
-  title: API Busca de Produtos - Stevo Integration
+  title: Buscar Produtos
   description: |
-    API para buscar produtos do catálogo Magazord via Stevo IA.
+    🔍 **BUSCA PRODUTOS NO CATÁLOGO**
     
-    **IMPORTANTE**: Você DEVE sempre fornecer pelo menos um parâmetro de busca.
-    Não envie requisições sem parâmetros.
-  version: 1.0.0
+    ⚠️ **REGRA OBRIGATÓRIA**: SEMPRE envie pelo menos um parâmetro!
+    
+    📝 **COMO USAR**:
+    1. Cliente pergunta: "tem jaleco?"
+    2. Você EXTRAI a palavra: "jaleco"
+    3. Você ENVIA: { "nome": "jaleco" }
+    
+    ❌ **NUNCA FAÇA**: Enviar {} vazio
+    ✅ **SEMPRE FAÇA**: Extrair termo e enviar no parâmetro "nome"
+    
+  version: 2.0.0
   contact:
-    name: Suporte
+    name: Suporte MVP
     
 servers:
   - url: https://zweu.vercel.app
@@ -18,21 +26,37 @@ paths:
   /api/buscar-produto:
     post:
       operationId: buscarProduto
-      summary: Buscar produtos no catálogo
+      summary: Buscar produtos
       description: |
-        Busca produtos no catálogo do Magazord.
+        🎯 **FUNÇÃO**: Buscar produtos no catálogo
         
-        **INSTRUÇÕES CRÍTICAS**:
-        - Você DEVE fornecer pelo menos um parâmetro: nome, codigo, produto ou mensagem
-        - Se o usuário perguntar "tem jaleco?", envie: nome="jaleco"
-        - Se o usuário perguntar "produto X123", envie: codigo="X123"
-        - NUNCA envie requisição sem parâmetros
+        📋 **INSTRUÇÕES OBRIGATÓRIAS**:
         
-        **EXEMPLOS**:
-        - Cliente: "tem jaleco?" → { "nome": "jaleco", "limit": 10 }
-        - Cliente: "mostra gorro azul" → { "nome": "gorro azul", "limit": 10 }
-        - Cliente: "código 300-MC-049" → { "codigo": "300-MC-049", "limit": 1 }
-        - Cliente: "quero 5 aventais" → { "nome": "avental", "limit": 5 }
+        PASSO 1: Leia a mensagem do cliente
+        PASSO 2: Identifique o PRODUTO mencionado
+        PASSO 3: Extraia a PALAVRA-CHAVE
+        PASSO 4: Coloque no parâmetro "nome"
+        PASSO 5: Envie a requisição
+        
+        📚 **EXEMPLOS DIRETOS**:
+        
+        Cliente fala: "tem jaleco?"
+        Você EXTRAI: "jaleco"
+        Você ENVIA: { "nome": "jaleco" }
+        
+        Cliente fala: "mostra gorro azul"
+        Você EXTRAI: "gorro azul"
+        Você ENVIA: { "nome": "gorro azul" }
+        
+        Cliente fala: "código 300-MC-049"
+        Você EXTRAI: "300-MC-049"
+        Você ENVIA: { "codigo": "300-MC-049" }
+        
+        Cliente fala: "quero 5 aventais"
+        Você EXTRAI: "avental"
+        Você ENVIA: { "nome": "avental", "limit": 5 }
+        
+        ⚠️ **CRÍTICO**: NUNCA envie {} vazio!
         
       requestBody:
         required: true
@@ -43,49 +67,60 @@ paths:
               properties:
                 nome:
                   type: string
-                  description: Nome ou palavra-chave do produto (ex. "jaleco", "gorro azul")
+                  description: |
+                    📝 PALAVRA-CHAVE do produto que o cliente mencionou
+                    
+                    Exemplos:
+                    - Cliente: "tem jaleco?" → nome: "jaleco"
+                    - Cliente: "mostra gorro" → nome: "gorro"
+                    - Cliente: "preciso avental" → nome: "avental"
                   example: "jaleco"
+                  
                 codigo:
                   type: string
-                  description: Código exato do produto
+                  description: |
+                    🔢 CÓDIGO EXATO quando o cliente mencionar código
+                    
+                    Exemplo:
+                    - Cliente: "código 300-MC-049" → codigo: "300-MC-049"
                   example: "300-MC-049"
-                produto:
-                  type: string
-                  description: Termo alternativo para nome do produto
-                  example: "avental"
-                mensagem:
-                  type: string
-                  description: Mensagem completa do usuário (será processada)
-                  example: "preciso de um jaleco branco"
+                  
                 limit:
                   type: integer
-                  description: Quantidade máxima de produtos a retornar
+                  description: Quantidade de resultados (padrão 10)
                   default: 10
                   minimum: 1
                   maximum: 50
                   example: 10
-              # Pelo menos um desses campos deve ser fornecido
-              anyOf:
-                - required: [nome]
-                - required: [codigo]
-                - required: [produto]
-                - required: [mensagem]
+                  
+              required:
+                - nome
+                
             examples:
-              busca_por_nome:
-                summary: Buscar por nome
+              exemplo_basico:
+                summary: Cliente pergunta "tem jaleco?"
+                description: Você extrai "jaleco" e envia
                 value:
                   nome: "jaleco"
-                  limit: 10
-              busca_por_codigo:
-                summary: Buscar por código
+                  
+              exemplo_com_cor:
+                summary: Cliente pergunta "mostra gorro azul"
+                description: Você extrai "gorro azul" e envia
+                value:
+                  nome: "gorro azul"
+                  
+              exemplo_com_quantidade:
+                summary: Cliente pede "quero 5 aventais"
+                description: Você extrai "avental" e limit 5
+                value:
+                  nome: "avental"
+                  limit: 5
+                  
+              exemplo_codigo:
+                summary: Cliente fala "código 300-MC-049"
+                description: Você usa o parâmetro codigo
                 value:
                   codigo: "300-MC-049"
-                  limit: 1
-              busca_por_termo:
-                summary: Buscar por termo genérico
-                value:
-                  produto: "gorro azul"
-                  limit: 5
                   
       responses:
         '200':
@@ -100,10 +135,21 @@ paths:
                     example: true
                   total_produtos:
                     type: integer
-                    description: Total de produtos encontrados
-                    example: 15
+                    description: Total de produtos encontrados no catálogo
+                    example: 279
+                  produtos_retornados:
+                    type: integer
+                    description: Quantidade de produtos nesta resposta (máx 10)
+                    example: 10
+                  mensagem_para_cliente:
+                    type: string
+                    description: |
+                      🎯 USE ESTA MENSAGEM COMO BASE para responder o cliente!
+                      Ela já vem formatada e pronta para usar.
+                    example: "Encontrei 279 produto(s). Aqui estão os primeiros 10:"
                   produtos:
                     type: array
+                    description: Lista dos produtos encontrados
                     items:
                       type: object
                       properties:
@@ -210,17 +256,77 @@ components:
   schemas: {}
   
 x-stevo-instructions: |
-  INSTRUÇÕES PARA O STEVO IA:
+  ═══════════════════════════════════════════════════════════════
+  🤖 STEVO - INSTRUÇÕES COMPLETAS
+  ═══════════════════════════════════════════════════════════════
   
-  1. Quando o cliente perguntar sobre produtos, SEMPRE chame esta ferramenta
-  2. NUNCA envie requisição sem parâmetros
-  3. Extraia o termo de busca da mensagem do cliente
-  4. Use o parâmetro "nome" para termos genéricos
-  5. Use o parâmetro "codigo" para códigos específicos
-  6. Sempre adicione "limit" (padrão: 10)
+  📋 QUANDO USAR:
+  Cliente pergunta sobre produtos, estoque, preço ou disponibilidade
   
-  EXEMPLOS PRÁTICOS:
-  - "tem jaleco?" → nome="jaleco", limit=10
-  - "mostra gorro" → nome="gorro", limit=10
-  - "código X123" → codigo="X123", limit=1
-  - "quero ver 20 aventais" → nome="avental", limit=20
+  📤 COMO ENVIAR:
+  1. Extraia a palavra-chave da mensagem
+  2. Envie: { "nome": "palavra_extraida" }
+  
+  📥 COMO INTERPRETAR A RESPOSTA:
+  
+  A API retorna um JSON assim:
+  {
+    "sucesso": true,
+    "total_produtos": 279,
+    "produtos_retornados": 10,
+    "mensagem_para_cliente": "Encontrei 279 produto(s)...",
+    "produtos": [ array de produtos ]
+  }
+  
+  ⚠️ INSTRUÇÕES CRÍTICAS PARA RESPONDER O CLIENTE:
+  
+  1️⃣ Use o campo "mensagem_para_cliente" como base
+  2️⃣ Mostre os produtos do array "produtos"
+  3️⃣ Para cada produto, mostre:
+     - nome
+     - preco (ou preco_promocional se disponível)
+     - estoque_disponivel
+  
+  ═══════════════════════════════════════════════════════════════
+  📚 EXEMPLO DE RESPOSTA AO CLIENTE:
+  ═══════════════════════════════════════════════════════════════
+  
+  Cliente: "tem jaleco?"
+  Você ENVIA: { "nome": "jaleco" }
+  
+  API RETORNA:
+  {
+    "total_produtos": 279,
+    "mensagem_para_cliente": "Encontrei 279 produto(s)...",
+    "produtos": [
+      {
+        "nome": "Jaleco Branco Manga Longa",
+        "preco": 89.90,
+        "estoque_disponivel": 50
+      }
+    ]
+  }
+  
+  VOCÊ RESPONDE AO CLIENTE:
+  "Sim! Encontrei 279 jalecos disponíveis. Aqui estão alguns:
+  
+  1. Jaleco Branco Manga Longa - R$ 89,90 (50 em estoque)
+  2. [próximo produto]
+  ..."
+  
+  ═══════════════════════════════════════════════════════════════
+  ❌ SE total_produtos = 0:
+  ═══════════════════════════════════════════════════════════════
+  
+  VOCÊ RESPONDE: "Não encontrei esse produto no momento."
+  
+  ═══════════════════════════════════════════════════════════════
+  ✅ SEMPRE:
+  ═══════════════════════════════════════════════════════════════
+  
+  - Use os dados REAIS da resposta
+  - Mostre preços e estoque
+  - Seja claro e objetivo
+  - Ofereça ajuda adicional
+  
+  ═══════════════════════════════════════════════════════════════
