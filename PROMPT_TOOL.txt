@@ -1,37 +1,37 @@
-Ferramenta de busca de produtos Dana Jalecos.
+IMPORTANTE: Você DEVE preencher os parâmetros abaixo quando usar esta ferramenta.
 
-PARÂMETROS QUE VOCÊ PODE USAR:
-• nome - palavra-chave do produto
-• codigo - código do produto
-• limit - quantidade de resultados (padrão: 10)
+PARÂMETROS OBRIGATÓRIOS (preencha pelo menos UM):
+• nome (string) - palavra-chave do produto
+• codigo (string) - código do produto
+• limit (number) - quantidade (padrão: 10)
 
-COMO PREENCHER:
+INSTRUÇÕES CRÍTICAS:
+1. NUNCA deixe os parâmetros vazios
+2. SEMPRE extraia informações da mensagem do cliente
+3. SEMPRE preencha "nome" quando cliente mencionar produto
+4. SEMPRE adicione "limit" com valor numérico
+
+EXEMPLOS OBRIGATÓRIOS:
 
 Cliente: "tem jaleco?"
-→ nome = "jaleco"
-→ limit = 10
+VOCÊ PREENCHE:
+nome = "jaleco"
+limit = 10
 
 Cliente: "mostra gorro azul"
-→ nome = "gorro azul"
-→ limit = 10
+VOCÊ PREENCHE:
+nome = "gorro azul"
+limit = 10
 
-Cliente: "busca código 300-MC-049"
-→ codigo = "300-MC-049"
-→ limit = 1
+Cliente: "código 300-MC-049"
+VOCÊ PREENCHE:
+codigo = "300-MC-049"
+limit = 1
 
-Cliente: "quero ver 5 aventais"
-→ nome = "avental"
-→ limit = 5
+Cliente: "quero 5 aventais"
+VOCÊ PREENCHE:
+nome = "avental"
+limit = 5
 
-SEMPRE preencha pelo menos "nome" ou "codigo".
-SEMPRE adicione "limit" (use 10 se cliente não especificar).
-
-RESPOSTA DA API:
-{
-  "total": 279,
-  "produtos": [
-    {"nome": "Jaleco...", "preco": 79.90, "imagens": ["url"], "estoque": 150}
-  ]
-}
-
-Interprete e responda naturalmente ao cliente.
+Se você enviar parâmetros VAZIOS, a requisição vai FALHAR.
+SEMPRE preencha pelo menos "nome" com o produto que o cliente mencionou.

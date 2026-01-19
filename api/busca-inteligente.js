@@ -14,53 +14,44 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Recebe QUALQUER parâmetro possível
+    // Recebe parâmetros
     const params = { ...req.query, ...req.body };
-    console.log('📥 Todos os parâmetros:', params);
+    console.log('📥 Parâmetros recebidos:', params);
     
-    // Tenta extrair mensagem de QUALQUER campo
-    let mensagem = params.mensagem || params.query || params.q || params.texto || 
-                   params.nome || params.busca || params.search || params.produto || '';
+    // VALIDAÇÃO OBRIGATÓRIA - precisa ter pelo menos um parâmetro
+    const temNome = params.nome && String(params.nome).trim().length > 0;
+    const temCodigo = params.codigo && String(params.codigo).trim().length > 0;
+    const temMensagem = params.mensagem && String(params.mensagem).trim().length > 0;
     
-    // Se AINDA não tem mensagem, pega QUALQUER valor de string dos params
-    if (!mensagem && Object.keys(params).length > 0) {
-      const valores = Object.values(params);
-      mensagem = valores.find(v => typeof v === 'string' && v.length > 0) || '';
+    console.log('🔍 Validação:', { temNome, temCodigo, temMensagem });
+    
+    if (!temNome && !temCodigo && !temMensagem) {
+      console.log('❌ ERRO: Nenhum parâmetro válido recebido');
+      return res.status(400).json({
+        success: false,
+        error: 'Parâmetros vazios',
+        message: 'O Stevo DEVE preencher pelo menos um parâmetro: nome, codigo ou mensagem',
+        recebido: params,
+        instrucao: 'Configure a Tool no Stevo para preencher os parâmetros corretamente'
+      });
     }
     
-    console.log('💬 Mensagem interpretada:', mensagem);
-
-    if (!mensagem) {
-      console.log('⚠️ Nenhuma mensagem detectada. Retornando produtos padrão.');
-      mensagem = 'jaleco'; // Default para teste
-    }
-
-    // INTERPRETA a mensagem e monta query
-    const magazordQuery = { limit: 10 };
-    const msgLower = mensagem.toLowerCase();
-
-    // Extrai limite se mencionado
-    const matchLimit = msgLower.match(/(\d+)\s*(produto|item|jaleco|unidade)/);
-    if (matchLimit) magazordQuery.limit = parseInt(matchLimit[1]);
-
-    // Extrai código se mencionado
-    const matchCodigo = msgLower.match(/c[óo]digo[:\s]*([\w-]+)/i);
-    if (matchCodigo) {
-      magazordQuery.codigo = matchCodigo[1].toUpperCase();
-      magazordQuery.limit = 1;
+    // Extrai termo de busca
+    let termoBusca = params.nome || params.codigo || params.mensagem || '';
+    termoBusca = String(termoBusca).trim();
+    
+    console.log('✅ Termo de busca:', termoBusca);
+    
+    // Monta query Magazord
+    const magazordQuery = {
+      limit: parseInt(params.limit) || 10
+    };
+    
+    if (params.codigo) {
+      magazordQuery.codigo = params.codigo;
     } else {
-      // Monta busca por nome
-      let termo = msgLower
-        .replace(/tem\s+|quero\s+|preciso\s+de\s+|busca\s+|procuro\s+/g, '')
-        .replace(/\?/g, '')
-        .replace(/tamanho\s+[pmg]+/gi, '')
-        .replace(/foto|imagem|mostra/gi, '')
-        .replace(/\d+\s*(produto|item|unidade)/gi, '')
-        .trim();
-      if (termo) magazordQuery.nome = termo;
+      magazordQuery.nome = termoBusca;
     }
-
-    magazordQuery.disponivel = 1;
 
     console.log('📋 Query:', magazordQuery);
 
