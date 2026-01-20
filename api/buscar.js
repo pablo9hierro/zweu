@@ -20,37 +20,15 @@ export default async function handler(req, res) {
     const params = { ...req.query, ...req.body };
     console.log('📝 Parâmetros unificados:', JSON.stringify(params, null, 2));
 
-    // Monta query para Magazord - ACEITA TODOS OS PARÂMETROS
+    // Monta query para Magazord
     const magazordQuery = {};
     
-    // Básicos
     if (params.nome) magazordQuery.nome = params.nome;
     if (params.codigo) magazordQuery.codigo = params.codigo;
     if (params.ean) magazordQuery.ean = parseInt(params.ean);
-    
-    // Filtros
     if (params.categoria) magazordQuery.categoria = parseInt(params.categoria);
-    if (params.marca) magazordQuery.marca = parseInt(params.marca);
-    if (params.loja) magazordQuery.loja = parseInt(params.loja);
-    if (params.ativo !== undefined) magazordQuery.ativo = parseInt(params.ativo);
-    if (params.disponivel !== undefined) magazordQuery.disponivel = parseInt(params.disponivel);
-    
-    // Preço
-    if (params.precoMin) magazordQuery.precoMin = parseFloat(params.precoMin);
-    if (params.precoMax) magazordQuery.precoMax = parseFloat(params.precoMax);
-    
-    // Ordenação
-    if (params.order) magazordQuery.order = params.order;
-    if (params.orderDirection) magazordQuery.orderDirection = params.orderDirection;
-    
-    // Paginação
-    if (params.page) magazordQuery.page = parseInt(params.page);
     if (params.limit) magazordQuery.limit = parseInt(params.limit) || 10;
     else magazordQuery.limit = 10; // Default
-    
-    // Datas
-    if (params.dataAtualizacaoInicio) magazordQuery.dataAtualizacaoInicio = params.dataAtualizacaoInicio;
-    if (params.dataAtualizacaoFim) magazordQuery.dataAtualizacaoFim = params.dataAtualizacaoFim;
 
     console.log('🔍 Query montada para Magazord:', JSON.stringify(magazordQuery, null, 2));
 
