@@ -23,16 +23,46 @@ export default async function handler(req, res) {
     // Unifica body + query params
     const params = { ...req.query, ...req.body };
     
-    // Extrai termo de busca (aceita: nome, codigo, produto, mensagem)
-    const termoBusca = params.nome || params.codigo || params.produto || params.mensagem || '';
+    console.log('🔍 Todos os parâmetros recebidos:', params);
     
-    // VALIDAÇÃO CRÍTICA: SEM PARÂMETROS = ERRO
+    // Extrai termo de busca - ACEITA QUALQUER VARIAÇÃO
+    let termoBusca = 
+      params.nome || 
+      params.codigo || 
+      params.produto || 
+      params.mensagem || 
+      params.search ||      // ← NOVO: Stevo usa "search"
+      params.query ||       // ← NOVO: Pode usar "query"
+      params.termo ||       // ← NOVO: Pode usar "termo"
+      params.text ||        // ← NOVO: Pode usar "text"
+      params.palavra ||     // ← NOVO: Pode usar "palavra"
+      '';
+    
+    // Se AINDA vazio, pega QUALQUER valor string não vazio
+    if (!termoBusca || termoBusca.trim() === '') {
+      const todosValores = Object.values(params).filter(v => 
+        v && 
+        typeof v === 'string' && 
+        v.trim().length > 0 && 
+        v !== 'undefined' &&
+        !isNaN(v) === false // não é número
+      );
+      
+      if (todosValores.length > 0) {
+        termoBusca = todosValores[0];
+        console.log('⚡ Termo extraído automaticamente:', termoBusca);
+      }
+    }
+    
+    // VALIDAÇÃO: SEM PARÂMETROS = ERRO
     if (!termoBusca || termoBusca.trim() === '') {
       console.log('❌ ERRO: Nenhum parâmetro de busca fornecido');
+      console.log('💡 Dica: Configure o Stevo para preencher "nome" ou "search" com o termo');
       return res.status(400).json({
         error: 'Parâmetro obrigatório não fornecido',
-        mensagem: 'Você deve fornecer pelo menos um dos parâmetros: nome, codigo, produto ou mensagem',
+        mensagem: 'Você deve fornecer pelo menos um dos parâmetros: nome, search, codigo, produto ou mensagem',
         parametros_recebidos: params,
+        dica: 'Configure o Stevo para extrair o termo da mensagem do cliente e preencher o parâmetro "nome"',
         exemplo: {
           nome: 'jaleco',
           limit: 10

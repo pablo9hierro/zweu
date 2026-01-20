@@ -20,10 +20,28 @@
 - Clique em **Editar**
 
 ### 3️⃣ Cole o Novo OpenAPI
+
+**ESCOLHA UMA DAS OPÇÕES:**
+
+**OPÇÃO 1 - JSON (Recomendado se Stevo não aceita YAML):**
+- Abra o arquivo: [`openapi.json`](./openapi.json)
+- **SELECIONE TUDO** (Ctrl+A)
+- **COPIE** (Ctrl+C)
+- No Stevo, **COLE** no campo de especificação
+- Clique em **Salvar**
+
+**OPÇÃO 2 - TXT (Mais legível):**
+- Abra o arquivo: [`openapi.txt`](./openapi.txt)
+- **SELECIONE TUDO** (Ctrl+A)
+- **COPIE** (Ctrl+C)
+- No Stevo, **COLE** no campo de especificação
+- Clique em **Salvar**
+
+**OPÇÃO 3 - YAML (Se Stevo aceitar):**
 - Abra o arquivo: [`openapi.yaml`](./openapi.yaml)
 - **SELECIONE TUDO** (Ctrl+A)
 - **COPIE** (Ctrl+C)
-- No Stevo, **COLE** no campo de especificação OpenAPI
+- No Stevo, **COLE** no campo de especificação
 - Clique em **Salvar**
 
 ### 4️⃣ Adicione Instruções na IA
